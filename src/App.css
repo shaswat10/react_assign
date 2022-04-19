@@ -1,0 +1,21 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+.filterbar_first{
+  text-align: start;
+  text-decoration: underline;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.filterbar_sec{
+  text-align: end;
+  padding-left: 18em;
+}
+
+.actionCls{
+  text-align: center;
+  padding: 2em;
+}
