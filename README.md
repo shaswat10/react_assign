@@ -1,4 +1,5 @@
 # Getting Started with Create React App
+install sweetalert (npm install sweetalert --save)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
