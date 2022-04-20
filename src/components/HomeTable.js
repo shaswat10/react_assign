@@ -4,13 +4,20 @@ import { Link } from "react-router-dom";
 import ModalPopup from "./ModalPopup";
 import axios from "axios";
 import { DELETE_API_URL} from '../const'
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 function HomeTable({ list }) {
+  let navigate = useNavigate(); 
+
+  const routeChange = (userData) =>{ 
+    let path = "/edit/"; 
+    navigate(path,{ state: userData,  setUpdateView:setUpdateView, updateView:updateView});
+  }
   const [popupstatus, setPopupstatus] = useState(false);
 
   const [show, setShow] = useState(false);
   const [deleteId, setDeleteId] = useState("");
+  const [updateView, setUpdateView] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -39,6 +46,8 @@ function HomeTable({ list }) {
   useEffect(() => {
 
   }, [deleteId])
+  
+
   
 
   return (
@@ -75,8 +84,10 @@ function HomeTable({ list }) {
                 <td>{userdata.pincode}</td>
                 <td className="actionCls">
                   <span>
-                    <Button variant="primary">
-                      <Link to={"/edit/" + userdata.email}>Edit</Link>
+                    <Button variant="primary" onClick={(e)=>{e.preventDefault()
+                    routeChange(userdata)
+                    }}>
+                      Edit
                     </Button>
                   </span>
 

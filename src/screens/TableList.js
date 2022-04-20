@@ -22,6 +22,7 @@ function TableList() {
 
   useEffect(() => {
     fetchUsersApi(FETCH_API_URL);
+    // localStorage.clear()
   }, []);
 
 

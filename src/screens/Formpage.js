@@ -1,71 +1,90 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { persistStore, persistReducer } from "redux-persist";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
 import Navbarcomp from "../components/Navbarcomp";
 import csspage from "../cssmodules/Formpage.module.css";
 import axios from "axios";
-import { Navigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
+import swal from "sweetalert";
+import { ADD, ADD_API_URL, EDIT, EDIT_API_URL } from "../const";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import { ADD_API_URL, EDIT, EDIT_API_URL } from "../const";
+function Formpage({ formType, userData }) {
+  console.log("DDDDDDDDDDDDD")
+  let location = useLocation();
+  let navigate = useNavigate(); 
+  console.log(location.state)
 
-function Formpage({formType}) {
- 
-  const [firstname, setFirstname] = useState(null);
-  const [lastname, setLastname] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [state, setState] = useState({ label: "Mumbai", value: "Mumbai" });
-  const [city, setCity] = useState(null);
-  const [pincode, setPincode] = useState(null);
-
-  const [formData, setFormData] = useState({ firstname: "", lastname: "", email: "", state: "", city: "", pincode: "" });
-
-
-  const userApiCall = (reqData) => {
-
-    
-    var DEFAULT_URL = formType==EDIT?EDIT_API_URL:ADD_API_URL
-
-
-      axios.get(DEFAULT_URL+`?param1=${formData.email}&param2=${formData.firstname}&param3=${formData.lastname}&param4=${formData.pincode}&param5=${formData.city}&param6=${formData.state}`).then((res) => {
-        console.log(res);
-        if(res.status == 200){
-          return (<Navigate to='/' />)
-        }
-      })
-   
-  }
-
-    
-    
-  
-
-
-  useEffect(() => {
-
-    var formvar = "";
-    if(localStorage.getItem("formData")){
-
-       formvar = JSON.parse(localStorage.getItem("formData"))
-    }
-    else{
-       formvar = {
+  if (localStorage.formData == undefined) {
+    window.localStorage.setItem(
+      "formData",
+      JSON.stringify({
         firstname: "",
         lastname: "",
         email: "",
-        state: { label: "Mumbai", value: "Mumbai" },
+        state: "",
         city: "",
         pincode: "",
-      }
+      })
+    );
+  }
+
+  const [formData, setFormData] = useState({
+    firstname: formType==ADD?JSON.parse(localStorage.formData).firstname:location.state.first_name,
+    lastname: formType==ADD?JSON.parse(localStorage.formData).lastname:location.state.last_name,
+    email: formType==ADD?JSON.parse(localStorage.formData).email:location.state.email,
+    state: formType==ADD?JSON.parse(localStorage.formData).state:location.state.state,
+    city: formType==ADD?JSON.parse(localStorage.formData).city:location.state.city,
+    pincode: formType==ADD?JSON.parse(localStorage.formData).pincode:location.state.pincode,
+  });
+
+  const userApiCall = (reqData) => {
+    var DEFAULT_URL = formType == EDIT ? EDIT_API_URL : ADD_API_URL;
+
+    axios
+      .get(
+        DEFAULT_URL +
+          `?param1=${formData.email}&param2=${formData.firstname}&param3=${formData.lastname}&param4=${formData.pincode}&param5=${formData.city}&param6=${formData.state}`
+      )
+      .then((res) => {
+        console.log(res);
+        if (res.status == 200) {
+          
+          location.state.setUpdateView(!location.state.updateView)
+          let path = "/"; 
+          navigate(path,{ state: userData });
+        }
+      });
+  };
+
+  const validateForm = () => {
+    const regex =
+      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    if (!formData.email || regex.test(formData.email) === false) {
+      swal("Please provide a valid email address");
+      return true;
     }
 
-    setFormData(formvar);
+    if (formData.pincode.length >= 6 || formData.pincode.length <= 6) {
+      swal("length of pincode should be 6");
+      return true;
+    }
 
-  }, []);
-
-
-  useEffect(() => {
-    window.localStorage.setItem("formData", JSON.stringify(formData));
-  }, [formData]);
+    for (const [key, value] of Object.entries(formData)) {
+      let response = false;
+      if (value == "") {
+        swal("Please fill all the fields");
+        return true;
+      }
+    }
+    return false;
+  };
+  function setLocalStorage(key, val) {
+    debugger;
+    var localData = JSON.parse(localStorage.formData);
+    localData[key] = val;
+    localStorage.setItem("formData", JSON.stringify(localData));
+  }
 
   const state_options = [
     { label: "Mumbai", value: "Mumbai" },
@@ -74,27 +93,31 @@ function Formpage({formType}) {
   ];
 
   const handleChange = (event) => {
-    debugger
-    
+    setLocalStorage("state", event.target.value);
     setFormData({ ...formData, state: event.target.value });
-    if(formType=='edit'){
-
+    if (formType == "edit") {
     }
     // setState(event.target.value);
   };
 
   const handleSubmit = (event) => {
-
-    event.preventDefault()
+    event.preventDefault();
 
     event.preventDefault();
     console.log(formData);
-    userApiCall(formData)
+
+    // if (validateForm()) {
+    //   return;
+    // }
+    // else{
+    //   userApiCall(formData)
+    // }
+    userApiCall(formData);
   };
 
   const setFormState = (event) => {};
 
-  useEffect(() => {}, []);
+
 
   return (
     <>
@@ -112,6 +135,7 @@ function Formpage({formType}) {
                   type="text"
                   value={formData.firstname}
                   onChange={(e) => {
+                    setLocalStorage("firstname", e.target.value);
                     setFormData({ ...formData, firstname: e.target.value });
                   }}
                 />
@@ -125,7 +149,9 @@ function Formpage({formType}) {
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
                   type="text"
+                  value={formData.lastname}
                   onChange={(e) => {
+                    setLocalStorage("lastname", e.target.value);
                     setFormData({ ...formData, lastname: e.target.value });
                   }}
                 />
@@ -141,7 +167,9 @@ function Formpage({formType}) {
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
+                  value={formData.email}
                   onChange={(e) => {
+                    setLocalStorage("email", e.target.value);
                     setFormData({ ...formData, email: e.target.value });
                   }}
                 />
@@ -174,6 +202,7 @@ function Formpage({formType}) {
                 <Form.Label>City</Form.Label>
                 <Form.Control
                   type="text"
+                  value={formData.city}
                   onChange={(e) => {
                     setFormData({ ...formData, city: e.target.value });
                   }}
@@ -187,7 +216,7 @@ function Formpage({formType}) {
               >
                 <Form.Label>Pincode</Form.Label>
                 <Form.Control
-                  type="number"
+                  type="text"
                   onChange={(e) => {
                     setFormData({ ...formData, pincode: e.target.value });
                   }}
