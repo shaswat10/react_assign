@@ -12,7 +12,8 @@ function Navbarcomp() {
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           <Navbar.Text>
-            <a href="#login">Home</a>
+          <Link to="/" style={{"textDecoration":"None"}}>Home</Link>
+
           </Navbar.Text>
         </Navbar.Collapse>
       </Container>

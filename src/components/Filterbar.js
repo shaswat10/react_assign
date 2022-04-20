@@ -2,7 +2,7 @@ import React from "react";
 import { Container, Navbar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-function Filterbar() {
+function Filterbar({setSearchItm}) {
   return (
     <Container>
       <div class="d-flex flex-row">
@@ -10,6 +10,9 @@ function Filterbar() {
         <div class="pt-2 w-50 filterbar_sec">
           <input
             type="text"
+            onChange={(e)=>{
+              setSearchItm(e.target.value)
+            }}
             class="form-control"
             id="exampleFormControlInput1"
             placeholder="search"

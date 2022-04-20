@@ -9,6 +9,8 @@ import axios from "axios";
 
 function TableList() {
   const [userList, setUserList] = useState(null);
+  const [updateView, setUpdateView] = useState(false);
+  const [searchItm, setSearchItm] = useState("");
 
   const fetchUsersApi = (urlData, reqData = null) => {
     axios.get(urlData, reqData).then((res) => {
@@ -23,7 +25,7 @@ function TableList() {
   useEffect(() => {
     fetchUsersApi(FETCH_API_URL);
     // localStorage.clear()
-  }, []);
+  }, [updateView]);
 
 
   if(userList != null){
@@ -32,10 +34,10 @@ function TableList() {
           <div>
             <Navbarcomp />
             <div className="pt-4">
-              <Filterbar />
+              <Filterbar setSearchItm={setSearchItm}/>
             </div>
             <div className="pt-5">
-              <HomeTable list={userList}/>
+              <HomeTable list={userList} setUpdateView={setUpdateView} updateView={updateView} searchItm={searchItm}/>
             </div>
           </div>
         </>

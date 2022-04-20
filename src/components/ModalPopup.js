@@ -18,8 +18,8 @@ function ModalPopup({ status, show, handleClose, handleShow, deleteUser }) {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={deleteUser}>
-            Save Changes
+          <Button variant="danger" onClick={deleteUser}>
+            Delete
           </Button>
         </Modal.Footer>
       </Modal>
